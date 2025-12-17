@@ -6,10 +6,7 @@ dotenv.config({ path: path.join(process.cwd(), ".env") });
 export default {
   env: process.env.NODE_ENV,
   port: process.env.PORT,
-  SSLcommer_store_id: process.env.SSLCOMMERZ_STORE_ID,
-  SSLcommer_password: process.env.SSLCOMMERZ_PASSWORD,
   CLIENT_URL: process.env.CLIENT_URL,
-  BACKEND_URL: process.env.BACKEND_URL,
   jwt: {
     access_secret: process.env.JWT_ACCESS_SECRET,
     refresh_secret: process.env.JWT_REFRESH_SECRET,
@@ -22,8 +19,5 @@ export default {
     salt_round: parseInt(process.env.SALT_ROUND || '12')
   },
   reset_pass_link: process.env.RESET_PASSWORD_LINK,
-  emailSender: {
-    email: process.env.EMAIL,
-    app_password: process.env.APP_PASSWORD
-  }
+ 
 };

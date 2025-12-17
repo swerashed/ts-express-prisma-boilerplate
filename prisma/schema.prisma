@@ -30,6 +30,12 @@ model User {
   updatedAt DateTime @updatedAt @map("updated_at")
   qr_codes  QRCode[]
 
+  isVerified Boolean   @default(false) @map("is_verified")
+  otp        String?
+  otpExpiry  DateTime? @map("otp_expiry")
+  resendAttempts Int       @default(0) @map("resend_attempts")
+  lastResendAt   DateTime? @map("last_resend_at")
+
   @@map("users")
 }
 

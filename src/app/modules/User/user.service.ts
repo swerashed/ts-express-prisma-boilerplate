@@ -9,13 +9,16 @@ import AppError from "@middleware/AppError";
 
 type TSafeUser = Omit<User, "password">;
 
-const createUser = async (req:Request ): Promise<TSafeUser> => {
+const createUser = async (req: Request): Promise<TSafeUser> => {
   const hashedPassword: string = await bcrypt.hash(req?.body?.password as string, 12);
   const userData = {
     email: req.body.email,
     password: hashedPassword,
     role: UserRole.USER,
     name: req.body.name,
+    isVerified: false,
+    otp: Math.floor(100000 + Math.random() * 900000).toString(),
+    otpExpiry: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
   };
 
   const existingUser = await prisma.user.findUnique({
@@ -35,6 +38,32 @@ const createUser = async (req:Request ): Promise<TSafeUser> => {
     data: userData,
     select: safeUserSelect,
   });
+
+  // Send OTP Email
+  const htmlContent = `
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: auto; padding: 30px; background-color: #1f1b2e; border-radius: 12px; border: 1px solid #3d2f59; color: #e0e0f0;">
+      <h2 style="color: #d6b1ff; text-align: center;">🛡️ Verify Your Account</h2>
+      <p style="font-size: 16px; margin-bottom: 20px;">Hello <strong>${userData.name}</strong>,</p>
+      <p style="font-size: 15px; line-height: 1.6;">
+        Use the code below to verify your account. This code is valid for 10 minutes.
+      </p>
+      <div style="text-align: center; margin: 30px 0;">
+        <span style="background-color: #8a4fff; color: #ffffff; padding: 14px 28px; border-radius: 8px; font-size: 24px; font-weight: bold; letter-spacing: 2px;">
+          ${userData.otp}
+        </span>
+      </div>
+      <p style="font-size: 14px; color: #c2b8e3; text-align: center;">
+        If you didn't create an account, you can safely ignore this email.
+      </p>
+    </div>
+  `;
+
+  await import("@utils/emailSender").then((mod) => mod.default(
+    userData.email,
+    "Verify Your Account",
+    `Your OTP is ${userData.otp}`,
+    htmlContent
+  ));
 
   return createdUserData;
 };
@@ -73,7 +102,7 @@ const createAdmin = async (req: Request): Promise<TSafeUser> => {
 };
 
 
-const getAllUserFromDB = async (params: any, options:any) => {
+const getAllUserFromDB = async (params: any, options: any) => {
   const { page, limit, skip } = paginationHelper.calculatePagination(options);
   const { searchTerm, ...filterData } = params;
   const andConditions: Prisma.UserWhereInput[] = [];
@@ -109,11 +138,11 @@ const getAllUserFromDB = async (params: any, options:any) => {
     orderBy:
       options.sortBy && options.sortOrder
         ? {
-            [options.sortBy]: options.sortOrder,
-          }
+          [options.sortBy]: options.sortOrder,
+        }
         : {
-            createdAt: "desc",
-          },
+          createdAt: "desc",
+        },
     select: safeUserSelect,
   });
 

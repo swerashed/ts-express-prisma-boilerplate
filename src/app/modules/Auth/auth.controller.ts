@@ -35,16 +35,16 @@ const refreshToken = CatchAsync(async (req, res) => {
 });
 
 const changePassword = CatchAsync(async (req, res) => {
-    const user = req?.body.user;
-    const result = await AuthService.changePassword(user, req.body);
+  const user = req?.body.user;
+  const result = await AuthService.changePassword(user, req.body);
 
-    SendResponse(res, {
-      statusCode: StatusCodes.OK,
-      success: true,
-      message: "Password changed successfully",
-      data: result,
-    });
-  }
+  SendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Password changed successfully",
+    data: result,
+  });
+}
 );
 
 const forgotPassword = CatchAsync(async (req, res) => {
@@ -71,10 +71,34 @@ const resetPassword = CatchAsync(async (req, res) => {
   });
 });
 
+const verifyOtp = CatchAsync(async (req, res) => {
+  const result = await AuthService.verifyOtp(req.body);
+
+  SendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Email Verified Successfully",
+    data: result,
+  });
+});
+
+const resendOtp = CatchAsync(async (req, res) => {
+  const result = await AuthService.resendOtp(req.body);
+
+  SendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "OTP resent successfully",
+    data: result,
+  });
+});
+
 export const AuthController = {
   loginUser,
   refreshToken,
   changePassword,
   forgotPassword,
   resetPassword,
+  verifyOtp,
+  resendOtp,
 };

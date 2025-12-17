@@ -36,7 +36,7 @@ const router = express.Router();
  *       401:
  *         description: Invalid credentials
  */
-router.post("/login",validateRequest(AuthValidation.loginSchema), AuthController.loginUser);
+router.post("/login", validateRequest(AuthValidation.loginSchema), AuthController.loginUser);
 
 
 router.post("/refresh-token", AuthController.refreshToken);
@@ -46,6 +46,8 @@ router.post(
   AuthController.changePassword
 );
 router.post("/forgot-password", AuthController.forgotPassword);
+router.post("/verify-email", AuthController.verifyOtp);
+router.post("/resend-otp", AuthController.resendOtp);
 router.post(
   "/reset-password",
   auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.USER),

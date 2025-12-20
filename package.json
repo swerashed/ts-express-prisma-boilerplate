@@ -1,9 +1,10 @@
 {
-  "name": "prisma-curd-server",
+  "name": "qrmonitor-server",
   "version": "1.0.0",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only --require tsconfig-paths/register src/server.ts",
-    "prod": "NODE_ENV=production node ./dist/server.js",
+    "dev": "NODE_ENV=development ts-node-dev --respawn --transpile-only --require tsconfig-paths/register src/server.ts",
+    "staging": "NODE_ENV=staging node dist/server.js",
+    "prod": "NODE_ENV=production node dist/server.js",
     "build": "tsup",
     "start": "node dist/server.js",
     "format": "prettier --write .",

@@ -2,7 +2,7 @@ import CatchAsync from "@utils/CatchAsync";
 import SendResponse from "@utils/SendResponse";
 import { StatusCodes } from "http-status-codes";
 import { QRCodeService } from "./qr-code.service";
-import getGeoLocation from "@helpers/getGeioLocation";
+import getGeoLocation from "@helpers/getGeoLocation";
 import { RequestWithUser } from "../User/user.constant";
 import { parseUserAgent } from "@helpers/parseUserAgent";
 
@@ -39,10 +39,11 @@ const deleteQrCode = CatchAsync(async (req, res) => {
 });
 
 const trackScan = CatchAsync(async (req, res) => {
-  const { qrId, fingerprint } = req.body;
+  const { qrId, fingerprint, lat, lon } = req.body;
   const userAgent = req.headers['user-agent'] || 'unknown';
   const ip =
     (req.headers['x-forwarded-for'] as string)?.split(",")[0]?.trim() ||
+    (req.headers['x-real-ip'] as string) ||
     req.socket.remoteAddress ||
     'unknown';
 
@@ -57,7 +58,9 @@ const trackScan = CatchAsync(async (req, res) => {
     location,
     deviceType,
     os,
-    browser
+    browser,
+    lat,
+    lon
   );
 
   SendResponse(res, {
@@ -68,7 +71,7 @@ const trackScan = CatchAsync(async (req, res) => {
   });
 });
 
-const getMyQRCodes = CatchAsync(async (req:RequestWithUser, res) => {
+const getMyQRCodes = CatchAsync(async (req: RequestWithUser, res) => {
   const creatorId = req.user?.id;
   const qrCodes = await QRCodeService.getAllQRCodes(creatorId);
 
@@ -79,7 +82,7 @@ const getMyQRCodes = CatchAsync(async (req:RequestWithUser, res) => {
     data: qrCodes,
   });
 });
-const getDashboardStats = CatchAsync(async (req:RequestWithUser, res) => {
+const getDashboardStats = CatchAsync(async (req: RequestWithUser, res) => {
   const creatorId = req.user?.id;
   const dashboardData = await QRCodeService.getDashboardStats(creatorId);
 
@@ -90,7 +93,7 @@ const getDashboardStats = CatchAsync(async (req:RequestWithUser, res) => {
     data: dashboardData,
   });
 });
-const getDashboardAnalytics = CatchAsync(async (req:RequestWithUser, res) => {
+const getDashboardAnalytics = CatchAsync(async (req: RequestWithUser, res) => {
   const creatorId = req.user?.id;
   const dashboardData = await QRCodeService.getDashboardAnalytics(creatorId);
 
@@ -103,7 +106,7 @@ const getDashboardAnalytics = CatchAsync(async (req:RequestWithUser, res) => {
 });
 
 
-const getSingleQRData = CatchAsync(async (req:RequestWithUser, res) => {
+const getSingleQRData = CatchAsync(async (req: RequestWithUser, res) => {
   const id = req.params?.id;
   const qrCodeData = await QRCodeService.getSingleQRData(id);
 
@@ -115,7 +118,7 @@ const getSingleQRData = CatchAsync(async (req:RequestWithUser, res) => {
   });
 });
 
-const getQRCodeScanSettings = CatchAsync(async (req:RequestWithUser, res) => {
+const getQRCodeScanSettings = CatchAsync(async (req: RequestWithUser, res) => {
   const id = req.params?.id;
   const qrCodeData = await QRCodeService.getQRCodeScanSettings(id);
 

@@ -63,7 +63,9 @@ const trackScan = async (
   location: any,
   deviceType: string,
   os: string,
-  browser: string
+  browser: string,
+  lat?: number,
+  lon?: number
 ) => {
 
 
@@ -77,6 +79,16 @@ const trackScan = async (
 
   const isUnique = !existingScan;
 
+  // Prepare update data for QRCode
+  const qrCodeUpdateData: any = {
+    totalScans: { increment: 1 },
+    lastScans: new Date(),
+  };
+
+  if (isUnique) {
+    qrCodeUpdateData.uniqueScans = { increment: 1 };
+  }
+
   // Use transaction to ensure consistency
   const [scan] = await prisma.$transaction([
     prisma.scan.create({
@@ -88,8 +100,8 @@ const trackScan = async (
         country: location.country || null,
         region: location.region || null,
         city: location.city || null,
-        latitude: location.latitude || null,
-        longitude: location.longitude || null,
+        latitude: lat || location.latitude || null,
+        longitude: lon || location.longitude || null,
         deviceType,
         os,
         browser,
@@ -99,11 +111,7 @@ const trackScan = async (
 
     prisma.qRCode.update({
       where: { id: qrId },
-      data: {
-        totalScans: { increment: 1 },
-        uniqueScans: isUnique ? { increment: 1 } : undefined,
-        lastScans: new Date(),
-      },
+      data: qrCodeUpdateData,
     }),
   ]);
 

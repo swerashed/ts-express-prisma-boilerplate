@@ -6,7 +6,7 @@ const QRCodeSchema = z.object({
   description: z.string().optional(),
   settings: z.record(z.any()).optional(), // or use z.unknown().optional() if more flexible
   totalEdits: z.number().int().nonnegative().optional(), // defaults to 0
-  targetUrl: z.string().url({ message: "Must be a valid URL" }),
+  targetUrl: z.string().min(1, "Target URL or Content is required"),
   totalScans: z.number().int().nonnegative().optional(), // defaults to 0
   uniqueScans: z.number().int().nonnegative().optional(), // defaults to 0
   lastScans: z.coerce.date().optional(), // coerce allows string/Date input
@@ -15,9 +15,9 @@ const QRCodeSchema = z.object({
     if (val === "false" || val === false) return false;
     return val;
   }, z.boolean()),
-  
-  createdAt: z.coerce.date().optional(), 
-  updatedAt: z.coerce.date().optional(), 
+
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
   creatorId: z.string().uuid({ message: "Invalid user ID format" }),
 }).strip();;
 
@@ -27,7 +27,7 @@ const QRCodeUpdateSchema = z.object({
   description: z.string().optional(),
   settings: z.record(z.any()).optional(), // or use z.unknown().optional() if more flexible
   totalEdits: z.number().int().nonnegative().optional(), // defaults to 0
-  targetUrl: z.string().url({ message: "Must be a valid URL" }).optional(),
+  targetUrl: z.string().min(1).optional(),
   totalScans: z.number().int().nonnegative().optional(), // defaults to 0
   uniqueScans: z.number().int().nonnegative().optional(), // defaults to 0
   lastScans: z.coerce.date().optional(), // coerce allows string/Date input
@@ -36,13 +36,13 @@ const QRCodeUpdateSchema = z.object({
     if (val === "false" || val === false) return false;
     return val;
   }, z.boolean()).optional(),
-  
-  createdAt: z.coerce.date().optional(), 
-  updatedAt: z.coerce.date().optional(), 
+
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
   creatorId: z.string().uuid({ message: "Invalid user ID format" }).optional(),
 }).strip();;
 
 export const QRCodeValidation = {
-    QRCodeSchema,
-    QRCodeUpdateSchema
+  QRCodeSchema,
+  QRCodeUpdateSchema
 }
